@@ -81,3 +81,23 @@ class PostModelTest(TestCase):
             with self.subTest(field=field):
                 self.assertEqual(
                     model._meta.get_field(field).verbose_name, expected_value)
+
+
+
+
+# это для проверки функции и сама функция — перепиши для её использования.
+    def test_post_field_help_text2(self):
+        """help_text в полях модели Post совпадает с ожидаемым."""
+        post = PostModelTest.post
+        field_help_texts = {
+            'text': 'Текст публикации',
+            'group': 'Сообщество для публикации',
+        }
+        self._check(field_help_texts, post, 'help_text')
+
+    def _check(self, field_expected, model, attr):
+        for field, expected_value in field_expected.items():
+            with self.subTest(field=field):
+                self.assertEqual(
+                    getattr(
+                        model._meta.get_field(field), attr), expected_value)
