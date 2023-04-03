@@ -15,7 +15,7 @@ class UsersURLTests(TestCase):
         cls.user = User.objects.create_user(username='user')
 
     def test_public_urls(self):
-        """Проверяем доступность публичных страниц"""
+        """Проверяем доступность публичных страниц."""
         public_urls = (
             '/auth/signup/',
             '/auth/login/',
