@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 
-from .forms import PostForm
+from .forms import CommentForm, PostForm
 from .models import Group, Post
 from .utils import paginate
 
@@ -55,11 +55,15 @@ def profile(request, username):
 def post_detail(request, post_id):
     post = get_object_or_404(Post, id=post_id)
     author = post.author
+    comments = post.comments.all()
     post_count = author.posts.count()
+    form = CommentForm()
     template = 'posts/post_detail.html'
     context = {
         'post': post,
         'post_count': post_count,
+        'form': form,
+        'comments': comments,
     }
     return render(request, template, context)
 
@@ -102,4 +106,17 @@ def post_edit(request, post_id):
         else:
             form = PostForm(instance=post)
         return render(request, template, {'form': form, 'is_edit': True})
+    return redirect('posts:post_detail', post_id)
+
+
+@login_required
+def add_comment(request, post_id):
+    # Получите пост и сохраните его в переменную post.
+    post = get_object_or_404(Post, id=post_id)
+    form = CommentForm(request.POST or None)
+    if form.is_valid():
+        comment = form.save(commit=False)
+        comment.author = request.user
+        comment.post = post
+        comment.save()
     return redirect('posts:post_detail', post_id)
