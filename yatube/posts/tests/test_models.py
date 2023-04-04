@@ -52,7 +52,7 @@ class PostModelTest(TestCase):
             'author': 'Автор',
             'group': 'Сообщество',
         }
-        self._check_verbose_name(field_verboses, post)
+        self._check_field_attr(field_verboses, post, 'verbose_name')
 
     def test_group_field_verbose_name(self):
         """verbose_name в полях модели Group совпадает с ожидаемым."""
@@ -62,7 +62,7 @@ class PostModelTest(TestCase):
             'slug': 'Уникальный путь',
             'description': 'Описание',
         }
-        self._check_verbose_name(field_verboses, group)
+        self._check_field_attr(field_verboses, group, 'verbose_name')
 
     def test_post_field_help_text(self):
         """help_text в полях модели Post совпадает с ожидаемым."""
@@ -71,32 +71,9 @@ class PostModelTest(TestCase):
             'text': 'Текст публикации',
             'group': 'Сообщество для публикации',
         }
-        for field, expected_value in field_help_texts.items():
-            with self.subTest(field=field):
-                self.assertEqual(
-                    post._meta.get_field(field).help_text, expected_value)
+        self._check_field_attr(field_help_texts, post, 'help_text')
 
-    def _check_verbose_name(self, field_expected, model):
-        for field, expected_value in field_expected.items():
-            with self.subTest(field=field):
-                self.assertEqual(
-                    model._meta.get_field(field).verbose_name, expected_value)
-
-
-
-
-# это для проверки функции и сама функция — перепиши для её использования.
-
-    def test_post_field_help_text2(self):
-        """help_text в полях модели Post совпадает с ожидаемым."""
-        post = PostModelTest.post
-        field_help_texts = {
-            'text': 'Текст публикации',
-            'group': 'Сообщество для публикации',
-        }
-        self._check(field_help_texts, post, 'help_text')
-
-    def _check(self, field_expected, model, attr):
+    def _check_field_attr(self, field_expected, model, attr):
         for field, expected_value in field_expected.items():
             with self.subTest(field=field):
                 self.assertEqual(

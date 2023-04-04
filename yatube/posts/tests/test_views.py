@@ -106,7 +106,7 @@ class PostsContextTests(TestCase):
         )
 
     def test_posts_context(self):
-        """Тест основного контекста"""
+        """Тест основного контекста."""
         names_kwargs_querysets = {
             INDEX_URL_NAME: (
                 {},
@@ -218,6 +218,7 @@ class PostsCreateEditContextTests(TestCase):
         form_fields = {
             'text': forms.fields.CharField,
             'group': forms.fields.ChoiceField,
+            'image': forms.fields.ImageField,
         }
         self._check_form_fields(form_fields, response)
 
@@ -232,6 +233,7 @@ class PostsCreateEditContextTests(TestCase):
         form_fields = {
             'text': forms.fields.CharField,
             'group': forms.fields.ChoiceField,
+            'image': forms.fields.ImageField,
         }
         self._check_form_fields(form_fields, response)
 
@@ -265,7 +267,7 @@ class PaginatorViewsTest(TestCase):
         )
 
     def test_paginator(self):
-        """Тест пагинатора"""
+        """Тест пагинатора."""
         names_kwargs_querysets = {
             INDEX_URL_NAME: (
                 {},

@@ -84,7 +84,6 @@ class PostsCreateEditFormTests(TestCase):
         self.assertTrue(
             Post.objects.filter(
                 text='Диахрония диссонирует скрытый смысл.',
-            ).filter(
                 group=self.group.id,
             ).exists()
         )
