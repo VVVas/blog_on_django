@@ -86,6 +86,7 @@ class PostModelTest(TestCase):
 
 
 # это для проверки функции и сама функция — перепиши для её использования.
+
     def test_post_field_help_text2(self):
         """help_text в полях модели Post совпадает с ожидаемым."""
         post = PostModelTest.post
