@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.cache import cache_page
 
 from .forms import CommentForm, PostForm
 from .models import Group, Post
@@ -9,6 +10,7 @@ from .utils import paginate
 User = get_user_model()
 
 
+@cache_page(20, key_prefix='index_page')
 def index(request):
     post_list = Post.objects.prefetch_related(
         'author',
