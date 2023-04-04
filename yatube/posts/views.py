@@ -68,7 +68,10 @@ def post_detail(request, post_id):
 def post_create(request):
     template = 'posts/create_post.html'
     if request.method == "POST":
-        form = PostForm(request.POST)
+        form = PostForm(
+            request.POST or None,
+            files=request.FILES or None
+        )
         if form.is_valid():
             post = form.save(commit=False)
             post.author = request.user
@@ -86,7 +89,11 @@ def post_edit(request, post_id):
     post = get_object_or_404(Post, id=post_id)
     if post.author == request.user:
         if request.method == "POST":
-            form = PostForm(request.POST, instance=post)
+            form = PostForm(
+                request.POST or None,
+                files=request.FILES or None,
+                instance=post
+            )
             if form.is_valid():
                 post = form.save(commit=False)
                 post.author = request.user
@@ -94,5 +101,5 @@ def post_edit(request, post_id):
                 return redirect('posts:post_detail', post_id)
         else:
             form = PostForm(instance=post)
-        return render(request, template, {'form': form, 'is_edit': 'is_edit'})
+        return render(request, template, {'form': form, 'is_edit': True})
     return redirect('posts:post_detail', post_id)
