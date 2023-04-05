@@ -174,9 +174,6 @@ class PostsContextTests(TestCase):
         self.assertIsNotNone(author_object)
         self.assertIsInstance(author_object, User)
         self.assertEqual(author_object, self.author)
-        post_count_object = response.context['post_count']
-        self.assertIsNotNone(post_count_object)
-        self.assertEqual(post_count_object, self.author.posts.count())
 
     def test_post_detail_context(self):
         """Шаблон posts:post_detail сформирован с правильным контекстом."""

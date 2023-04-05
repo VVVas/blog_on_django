@@ -1,11 +1,9 @@
 {% extends 'base.html' %}
 {% load thumbnail %}
-{% block title %}Последние обновления на сайте{% endblock %}
+{% block title %}Последние обновления избранных авторов{% endblock %}
 {% block content %}
-<h1>Последние обновления на сайте</h1>
+<h1>Последние обновления избранных авторов</h1>
 {% include 'posts/includes/switcher.html' %}
-{% load cache %}
-{% cache 20 index_page %}
 {% for post in page_obj %}
 <article>
   <ul>
@@ -30,5 +28,4 @@
 <hr>{% endif %}
 {% endfor %}
 {% include 'posts/includes/paginator.html' %}
-{% endcache %}
 {% endblock %}
