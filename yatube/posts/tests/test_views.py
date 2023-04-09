@@ -189,48 +189,6 @@ class PostsContextTests(TestCase):
                     page_obj, queryset, lambda x: x
                 )
 
-    def test_posts_cache(self):
-        """Тест кэширования."""
-        cache.clear()
-        # self.author_client = Client()
-        # self.author_client.force_login(self.author)
-        # cached_post = Post.objects.create(
-        #     author=self.author,
-        #     text='Парафраз нивелирует литературный метр.',
-        #     group=self.group,
-        # )
-        response_begin = self.client.get(reverse(INDEX_URL_NAME))
-        # self.assertEqual(response_begin.status_code, HTTPStatus.OK)
-        page_obj_begin = response_begin.context.get('page_obj')
-        # self.assertIsNotNone(page_obj_begin)
-        # self.assertIsInstance(page_obj_begin, Page)
-
-        # cached_post.delete()
-        self.another_post.delete()
-
-        response_middle = self.client.get(reverse(INDEX_URL_NAME))
-        # self.assertEqual(response_middle.status_code, HTTPStatus.OK)
-        page_obj_middle = response_middle.context.get('page_obj')
-        # self.assertIsNotNone(page_obj_middle)
-        # self.assertIsInstance(page_obj_middle, Page)
-
-        # self.assertQuerysetEqual(
-        #     page_obj_middle, page_obj_begin, lambda x: x
-        # )
-
-        cache.clear()
-
-        response_end = self.client.get(reverse(INDEX_URL_NAME))
-        # self.assertEqual(response_end.status_code, HTTPStatus.OK)
-        page_obj_end = response_end.context.get('page_obj')
-        # self.assertIsNotNone(page_obj_end)
-        # self.assertIsInstance(page_obj_end, Page)
-
-        # self.assertEqual(page_obj_end, page_obj_begin)
-        # self.assertQuerysetEqual(
-        #     page_obj_end, page_obj_begin, lambda x: x
-        # )
-
     def test_group_list_context(self):
         """Шаблон posts:group_list группы сформирован с контекстом, который
         отличается от контекста другой группы и с правильным
@@ -447,7 +405,8 @@ class PostsFollowTests(TestCase):
         response = self.user_client.get(
             reverse(
                 PROFILE_FOLLOW_URL_NAME,
-                kwargs={'username': self.author.username}),
+                kwargs={'username': self.author.username}
+            ),
             follow=True
         )
         self.assertRedirects(
@@ -464,7 +423,8 @@ class PostsFollowTests(TestCase):
         response = self.user_client.get(
             reverse(
                 PROFILE_UNFOLLOW_URL_NAME,
-                kwargs={'username': self.author.username}),
+                kwargs={'username': self.author.username}
+            ),
             follow=True
         )
         self.assertRedirects(
@@ -478,3 +438,26 @@ class PostsFollowTests(TestCase):
                 author=self.author
             ).exists()
         )
+
+
+class PostsCacheTests(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.author = User.objects.create_user(username='author')
+        cls.post = Post.objects.create(
+            author=cls.author,
+            text='Парафраз нивелирует литературный метр.',
+        )
+
+    def test_posts_cache_index(self):
+        """Тест кеширования."""
+        response_begin = self.client.get(reverse(INDEX_URL_NAME)).content
+        self.post.delete()
+        response_middle = self.client.get(reverse(INDEX_URL_NAME)).content
+        self.assertQuerysetEqual(
+            response_begin, response_middle, lambda x: x
+        )
+        cache.clear()
+        response_end = self.client.get(reverse(INDEX_URL_NAME)).content
+        self.assertNotEqual(response_begin, response_end)
