@@ -2,6 +2,7 @@
 {% load thumbnail %}
 {% block title %}{{ author.get_full_name }}{% endblock %}
 {% block content %}
+<div class="mb-5">
 <h1>Все публикации пользователя {{ author.get_full_name }}</h1>
 <h3>Всего публикаций: {{ author.posts.count }}</h3>
 {% if user.is_authenticated %}
@@ -21,6 +22,7 @@
   </a>
 {% endif %}
 {% endif %}
+</div>
 {% for post in page_obj %}
 <article>
   <ul>
