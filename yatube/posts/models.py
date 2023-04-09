@@ -1,5 +1,7 @@
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import models
+
 
 User = get_user_model()
 
@@ -41,7 +43,7 @@ class Post(models.Model):
     )
     image = models.ImageField(
         verbose_name='Картинка',
-        upload_to='posts/',
+        upload_to=settings.POSTS_UPLOAD_TO,
         blank=True
     )
 

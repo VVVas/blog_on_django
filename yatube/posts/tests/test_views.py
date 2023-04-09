@@ -262,16 +262,20 @@ class PostsContextTests(TestCase):
         """Шаблон posts:profile группы сформирован с правильным
         дополнительным контекстом
         """
-        response = self.client.get(
+        self.user_client = Client()
+        self.user_client.force_login(self.user)
+        response = self.user_client.get(
             reverse(PROFILE_URL_NAME,
                     kwargs={'username': self.author.username})
         )
         self.assertEqual(response.status_code, HTTPStatus.OK)
-
         author_object = response.context['author']
         self.assertIsNotNone(author_object)
         self.assertIsInstance(author_object, User)
         self.assertEqual(author_object, self.author)
+        following_object = response.context['following']
+        self.assertIsNotNone(following_object)
+        self.assertTrue(following_object)
 
     def test_post_detail_context(self):
         """Шаблон posts:post_detail сформирован с правильным контекстом."""

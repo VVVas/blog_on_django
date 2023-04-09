@@ -113,7 +113,7 @@ class PostsCreateEditFormTests(TestCase):
             Post.objects.filter(
                 text='Диахрония диссонирует скрытый смысл.',
                 group=self.group.id,
-                image='posts/small.gif',
+                image=settings.POSTS_UPLOAD_TO + self.uploaded.name,
             ).exists()
         )
 

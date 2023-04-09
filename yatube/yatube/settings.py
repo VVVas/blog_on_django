@@ -152,3 +152,4 @@ CACHES = {
 }
 
 POSTS_PER_PAGE = 10
+POSTS_UPLOAD_TO = 'posts/'
