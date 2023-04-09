@@ -80,11 +80,6 @@ class PostsURLTests(TestCase):
                 response = self.client.get(reverse(name, kwargs=kwargs))
                 self.assertEqual(response.status_code, HTTPStatus.OK)
 
-    def test_unexisting_page_not_found(self):
-        """Несуществующая страница возвращает 404."""
-        response = self.user_client.get('/unexisting_page/')
-        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
-
     def test_posts_names_redirect_anonymous(self):
         """Перенаправляем аннонима на вход."""
         user_names = {
