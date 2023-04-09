@@ -59,6 +59,7 @@ def post_detail(request, post_id):
     post = get_object_or_404(Post, id=post_id)
     author = post.author
     comments = post.comments.all()
+    page_obj = paginate(comments, request.GET.get('page'))
     post_count = author.posts.count()
     form = CommentForm()
     template = 'posts/post_detail.html'
@@ -66,7 +67,7 @@ def post_detail(request, post_id):
         'post': post,
         'post_count': post_count,
         'form': form,
-        'comments': comments,
+        'page_obj': page_obj,
     }
     return render(request, template, context)
 

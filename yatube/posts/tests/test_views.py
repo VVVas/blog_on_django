@@ -17,6 +17,8 @@ from posts.tests.constants import (
     FOLLOW_URL_NAME,
     GROUP_LIST_URL_NAME,
     PROFILE_URL_NAME,
+    PROFILE_FOLLOW_URL_NAME,
+    PROFILE_UNFOLLOW_URL_NAME,
     POST_DETAIL_URL_NAME,
     POST_CREATE_URL_NAME,
     POST_EDIT_URL_NAME,
@@ -170,6 +172,10 @@ class PostsContextTests(TestCase):
                 {'username': self.author.username},
                 self.author.posts.all(),
             ),
+            POST_DETAIL_URL_NAME: (
+                {'post_id': self.post.id},
+                self.post.comments.all(),
+            )
         }
         for name, params in names_kwargs_querysets.items():
             kwargs, queryset = params
@@ -279,11 +285,6 @@ class PostsContextTests(TestCase):
         post_count_object = response.context['post_count']
         self.assertIsNotNone(post_count_object)
         self.assertEqual(post_count_object, self.author.posts.count())
-        comments_object = response.context['comments']
-        self.assertIsNotNone(comments_object)
-        self.assertQuerysetEqual(
-            comments_object, self.post.comments.all(), lambda x: x
-        )
 
 
 class PostsCreateEditContextTests(TestCase):
@@ -358,6 +359,20 @@ class PaginatorViewsTest(TestCase):
             user=cls.user,
             author=cls.author
         )
+        cls.post = Post.objects.create(
+            author=cls.author,
+            text='Возврат к стереотипам неизменяем.',
+        )
+        Comment.objects.bulk_create(
+            [
+                Comment(
+                    author=cls.author,
+                    text=f'Аффилиация параллельна {i}.',
+                    post=cls.post,
+                ) for i in range(settings.POSTS_PER_PAGE
+                                 + settings.POSTS_PER_PAGE // 2)
+            ]
+        )
         Post.objects.bulk_create(
             [
                 Post(
@@ -392,6 +407,10 @@ class PaginatorViewsTest(TestCase):
                 {'username': self.author.username},
                 self.author.posts.all()[:settings.POSTS_PER_PAGE],
             ),
+            POST_DETAIL_URL_NAME: (
+                {'post_id': self.post.id},
+                self.post.comments.all()[:settings.POSTS_PER_PAGE],
+            )
         }
         for name, params in names_kwargs_querysets.items():
             kwargs, queryset = params
@@ -404,3 +423,54 @@ class PaginatorViewsTest(TestCase):
                 self.assertQuerysetEqual(
                     page_obj, queryset, lambda x: x
                 )
+
+
+class PostsFollowTests(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.author = User.objects.create_user(username='author')
+        cls.user = User.objects.create_user(username='user')
+        cls.post = Post.objects.create(
+            author=cls.author,
+            text='Басня возможна.',
+        )
+
+    def test_posts_follow_follow_unfollow(self):
+        """Тест подписки."""
+        self.user_client = Client()
+        self.user_client.force_login(self.user)
+        response = self.user_client.get(
+            reverse(
+                PROFILE_FOLLOW_URL_NAME,
+                kwargs={'username': self.author.username}),
+            follow=True
+        )
+        self.assertRedirects(
+            response, reverse(
+                PROFILE_URL_NAME, kwargs={'username': self.author.username}
+            )
+        )
+        self.assertTrue(
+            Follow.objects.filter(
+                user=self.user,
+                author=self.author
+            ).exists()
+        )
+        response = self.user_client.get(
+            reverse(
+                PROFILE_UNFOLLOW_URL_NAME,
+                kwargs={'username': self.author.username}),
+            follow=True
+        )
+        self.assertRedirects(
+            response, reverse(
+                PROFILE_URL_NAME, kwargs={'username': self.author.username}
+            )
+        )
+        self.assertFalse(
+            Follow.objects.filter(
+                user=self.user,
+                author=self.author
+            ).exists()
+        )
