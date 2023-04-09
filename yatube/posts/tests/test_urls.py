@@ -8,12 +8,17 @@ from django.urls import reverse
 from posts.models import Group, Post
 from posts.tests.constants import (
     INDEX_URL_NAME,
+    FOLLOW_URL_NAME,
     GROUP_LIST_URL_NAME,
     PROFILE_URL_NAME,
+    PROFILE_FOLLOW_URL_NAME,
+    PROFILE_UNFOLLOW_URL_NAME,
     POST_DETAIL_URL_NAME,
+    ADD_COMMENT_URL_NAME,
     POST_CREATE_URL_NAME,
     POST_EDIT_URL_NAME,
     INDEX_TEMPLATE,
+    FOLLOW_TEMPLATE,
     GROUP_LIST_TEMPLATE,
     PROFILE_TEMPLATE,
     POST_DETAIL_TEMPLATE,
@@ -45,10 +50,11 @@ class PostsURLTests(TestCase):
         self.author_client = Client()
         self.author_client.force_login(self.author)
 
-    def test_urls_templates(self):
+    def test_urls_access_templates(self):
         """URL-адрес доступен и использует соответствующий шаблон."""
         urls_templates = {
             '/': INDEX_TEMPLATE,
+            '/follow/': FOLLOW_TEMPLATE,
             f'/group/{self.group.slug}/': GROUP_LIST_TEMPLATE,
             f'/profile/{self.author.username}/': PROFILE_TEMPLATE,
             f'/posts/{self.post.id}/': POST_DETAIL_TEMPLATE,
@@ -61,7 +67,7 @@ class PostsURLTests(TestCase):
                 self.assertEqual(response.status_code, HTTPStatus.OK)
                 self.assertTemplateUsed(response, template)
 
-    def test_public_urls(self):
+    def test_public_names_access(self):
         """Проверяем доступность публичных страниц."""
         public_names = {
             INDEX_URL_NAME: {},
@@ -79,15 +85,17 @@ class PostsURLTests(TestCase):
         response = self.user_client.get('/unexisting_page/')
         self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
 
-    def test_post_create_edit_url_redirect_anonymous(self):
-        """Страницы создания и редактирования публикации перенаправят
-        анонимного пользователя на страницу логина.
-        """
-        user_urls = {
+    def test_posts_names_redirect_anonymous(self):
+        """Перенаправляем аннонима на вход."""
+        user_names = {
+            FOLLOW_URL_NAME: {},
+            PROFILE_FOLLOW_URL_NAME: {'username': self.author.username},
+            PROFILE_UNFOLLOW_URL_NAME: {'username': self.author.username},
+            ADD_COMMENT_URL_NAME: {'post_id': self.post.id},
             POST_CREATE_URL_NAME: {},
             POST_EDIT_URL_NAME: {'post_id': self.post.id},
         }
-        for name, kwargs in user_urls.items():
+        for name, kwargs in user_names.items():
             with self.subTest(name=name):
                 response = self.client.get(
                     reverse(name, kwargs=kwargs), follow=True
@@ -99,23 +107,52 @@ class PostsURLTests(TestCase):
                 )
                 self.assertRedirects(response, redirect_url)
 
-    def test_create_url_user(self):
-        """Страница создания публикации доступна пользователю."""
-        response = self.user_client.get(reverse(POST_CREATE_URL_NAME))
-        self.assertEqual(response.status_code, HTTPStatus.OK)
+    def test_posts_names_access_user(self):
+        """Пользователю доступны страницы"""
+        user_names = {
+            FOLLOW_URL_NAME: {},
+            POST_CREATE_URL_NAME: {},
+        }
+        for name, kwargs in user_names.items():
+            with self.subTest(name=name):
+                response = self.user_client.get(
+                    reverse(name, kwargs=kwargs)
+                )
+                self.assertEqual(response.status_code, HTTPStatus.OK)
 
-    def test_edit_url_user(self):
-        """Страница редактирования публикации перенаправит
-        пользователя на страницу публикации.
-        """
-        response = self.user_client.get(
-            reverse(POST_EDIT_URL_NAME, kwargs={'post_id': self.post.id}),
-            follow=True
-        )
-        self.assertRedirects(
-            response,
-            reverse(POST_DETAIL_URL_NAME, kwargs={'post_id': self.post.id})
-        )
+    def test_posts_names_redirect_user(self):
+        """Пользователя перенаправят страницы"""
+        names_kwargs_redirect_names = {
+            POST_EDIT_URL_NAME: (
+                {'post_id': self.post.id},
+                POST_DETAIL_URL_NAME,
+            ),
+            PROFILE_FOLLOW_URL_NAME: (
+                {'username': self.author.username},
+                PROFILE_URL_NAME,
+            ),
+            PROFILE_UNFOLLOW_URL_NAME: (
+                {'username': self.author.username},
+                PROFILE_URL_NAME,
+            ),
+
+            ADD_COMMENT_URL_NAME: (
+                {'post_id': self.post.id},
+                POST_DETAIL_URL_NAME,
+            ),
+        }
+        for name, params in names_kwargs_redirect_names.items():
+            kwargs, redirect_name = params
+            with self.subTest(name=name):
+                response = self.user_client.get(
+                    reverse(name, kwargs=kwargs),
+                    follow=True
+                )
+                self.assertEqual(response.status_code, HTTPStatus.OK)
+                self.assertRedirects(
+                    response,
+                    reverse(redirect_name, kwargs=kwargs)
+                )
 
     def test_edit_url_author(self):
         """Страница редактирования публикации доступна автору."""
