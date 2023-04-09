@@ -244,12 +244,9 @@ class PostsContextTests(TestCase):
         self.assertIsNotNone(post_object)
         self.assertIsInstance(post_object, Post)
         self.assertEqual(post_object, self.post)
-        post_count_object = response.context['post_count']
-        self.assertIsNotNone(post_count_object)
-        self.assertEqual(post_count_object, self.author.posts.count())
 
 
-class PostsCreateEditContextTests(TestCase):
+class CreateEditContextTests(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -288,7 +285,7 @@ class PostsCreateEditContextTests(TestCase):
         }
         self._check_form_fields(form_fields, response)
 
-    def test_post_detail_form_context(self):
+    def test_post_detail_comment_form_context(self):
         """Форма в шаблоне posts:post_detail имеет правильный контекст"""
         response = self.author_client.get(
             reverse(POST_DETAIL_URL_NAME, kwargs={'post_id': self.post.id})

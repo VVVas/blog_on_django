@@ -18,7 +18,7 @@
         Автор: {{ post.author.get_full_name }}
       </li>
       <li class="list-group-item d-flex justify-content-between align-items-center">
-        Всего публикаций автора: <span>{{ post_count }}</span>
+        Всего публикаций автора: <span>{{ post.author.posts.count }}</span>
       </li>
       <li class="list-group-item">
         <a href="{% url 'posts:profile' post.author %}">все публикации пользователя</a>
@@ -64,7 +64,8 @@
       </p>
     </div>
   </div>
-{% endfor %} 
+{% endfor %}
+{% include 'posts/includes/paginator.html' %}
   </article>
 </div>
 {% endblock %}

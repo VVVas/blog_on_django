@@ -57,15 +57,14 @@ def profile(request, username):
 
 def post_detail(request, post_id):
     post = get_object_or_404(Post, id=post_id)
-    author = post.author
-    comments = post.comments.all()
+    comments = post.comments.select_related(
+        'author',
+    )
     page_obj = paginate(comments, request.GET.get('page'))
-    post_count = author.posts.count()
     form = CommentForm()
     template = 'posts/post_detail.html'
     context = {
         'post': post,
-        'post_count': post_count,
         'form': form,
         'page_obj': page_obj,
     }
@@ -127,9 +126,10 @@ def add_comment(request, post_id):
 
 @login_required
 def follow_index(request):
-    user = request.user
-    author_list = user.follower.values('author')
-    post_list = Post.objects.filter(author__in=author_list)
+    author_list = request.user.follower.values('author')
+    post_list = Post.objects.filter(author__in=author_list).select_related(
+        'group',
+    )
     page_obj = paginate(post_list, request.GET.get('page'))
     template = 'posts/follow.html'
     context = {
@@ -140,7 +140,7 @@ def follow_index(request):
 
 @login_required
 def profile_follow(request, username):
-    # Подписаться на автора
+    """Подписаться на автора."""
     author = get_object_or_404(User, username=username)
     user = request.user
     if author != user:
@@ -150,7 +150,7 @@ def profile_follow(request, username):
 
 @login_required
 def profile_unfollow(request, username):
-    # Дизлайк, отписка
+    """Отписаться от автора."""
     author = get_object_or_404(User, username=username)
     user = request.user
     Follow.objects.filter(user=user, author=author).delete()

@@ -103,7 +103,7 @@ class PostsURLTests(TestCase):
                 self.assertRedirects(response, redirect_url)
 
     def test_posts_names_access_user(self):
-        """Пользователю доступны страницы"""
+        """Пользователю доступны страницы."""
         user_names = {
             FOLLOW_URL_NAME: {},
             POST_CREATE_URL_NAME: {},
@@ -116,7 +116,7 @@ class PostsURLTests(TestCase):
                 self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_posts_names_redirect_user(self):
-        """Пользователя перенаправят страницы"""
+        """Пользователя перенаправят страницы."""
         names_kwargs_redirect_names = {
             POST_EDIT_URL_NAME: (
                 {'post_id': self.post.id},

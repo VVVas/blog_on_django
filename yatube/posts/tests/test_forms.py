@@ -22,7 +22,7 @@ TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
 
 
 @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
-class PostsCreateEditFormTests(TestCase):
+class CreateEditFormTests(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -60,8 +60,7 @@ class PostsCreateEditFormTests(TestCase):
         self.author_client.force_login(self.author)
 
     def test_post_create_form(self):
-        """Валидная форма создает публикацию."""
-        # Подсчитаем количество публикаций
+        """Валидная форма создает публикацию"""
         posts_count = Post.objects.count()
         form_data = {
             'text': 'Цезура абсурдно осознаёт экзистенциальный дискурс.',
@@ -71,15 +70,12 @@ class PostsCreateEditFormTests(TestCase):
             data=form_data,
             follow=True
         )
-        # Проверяем, сработал ли редирект
         self.assertRedirects(
             response, reverse(
                 PROFILE_URL_NAME, kwargs={'username': self.author.username}
             )
         )
-        # Проверяем, увеличилось ли число публикаций
         self.assertEqual(Post.objects.count(), posts_count + 1)
-        # Проверяем, что публикаций создалась
         self.assertTrue(
             Post.objects.filter(
                 text='Цезура абсурдно осознаёт экзистенциальный дискурс.',
@@ -87,8 +83,7 @@ class PostsCreateEditFormTests(TestCase):
         )
 
     def test_post_edit_form(self):
-        """Валидная форма редактирует публикацию."""
-        # Подсчитаем количество публикаций
+        """Валидная форма редактирует публикацию"""
         posts_count = Post.objects.count()
         form_data = {
             'text': 'Диахрония диссонирует скрытый смысл.',
@@ -100,15 +95,12 @@ class PostsCreateEditFormTests(TestCase):
             data=form_data,
             follow=True
         )
-        # Проверяем, сработал ли редирект
         self.assertRedirects(
             response, reverse(
                 POST_DETAIL_URL_NAME, kwargs={'post_id': self.post.id}
             )
         )
-        # Проверяем, не увеличилось ли число публикаций
         self.assertEqual(Post.objects.count(), posts_count)
-        # Проверяем, что публикация изменилась
         self.assertTrue(
             Post.objects.filter(
                 text='Диахрония диссонирует скрытый смысл.',
@@ -118,8 +110,7 @@ class PostsCreateEditFormTests(TestCase):
         )
 
     def test_post_detail_comment_form(self):
-        """Валидная форма создает комментарий."""
-        # Подсчитаем количество комментариев
+        """Валидная форма создает комментарий"""
         comments_count = Comment.objects.count()
         form_data = {
             'text': 'Наряду с нейтральной лексикой рифма возможна.',
@@ -129,15 +120,12 @@ class PostsCreateEditFormTests(TestCase):
             data=form_data,
             follow=True
         )
-        # Проверяем, сработал ли редирект
         self.assertRedirects(
             response, reverse(
                 POST_DETAIL_URL_NAME, kwargs={'post_id': self.post.id}
             )
         )
-        # Проверяем, увеличилось ли число комментариев
         self.assertEqual(Comment.objects.count(), comments_count + 1)
-        # Проверяем, что комментарий создалася
         self.assertTrue(
             Comment.objects.filter(
                 text='Наряду с нейтральной лексикой рифма возможна.',
