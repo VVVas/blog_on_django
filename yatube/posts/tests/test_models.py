@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 
-from posts.models import Comment, Group, Post
+from posts.models import Comment, Follow, Group, Post
 
 User = get_user_model()
 
@@ -10,20 +10,25 @@ class PostModelTest(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.user = User.objects.create_user(username='auth')
+        cls.user = User.objects.create_user(username='user')
+        cls.author = User.objects.create_user(username='author')
         cls.group = Group.objects.create(
             title='Тестовая группа при тесте модели',
             slug='test-slug-model',
             description='Тестовое описание при тесте модели группы',
         )
         cls.post = Post.objects.create(
-            author=cls.user,
+            author=cls.author,
             text='Парономазия откровенна. Графомания отталкивает дольник.',
         )
         cls.comment = Comment.objects.create(
             post=cls.post,
             author=cls.user,
             text='Художественная гармония возможна.'
+        )
+        cls.follow = Follow.objects.create(
+            user=cls.user,
+            author=cls.author,
         )
 
     def test_posts_model_str(self):
@@ -43,6 +48,7 @@ class PostModelTest(TestCase):
             PostModelTest.post: 'Публикация',
             PostModelTest.group: 'Сообщество',
             PostModelTest.comment: 'Комментарий',
+            PostModelTest.follow: 'Подписка',
         }
         for model, verbose_name in models_verbose_names.items():
             with self.subTest(model=model):
