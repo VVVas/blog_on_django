@@ -7,6 +7,8 @@
 {% for post in page_obj %}
   {% include 'posts/includes/post.html' %}
   {% if not forloop.last %}<hr>{% endif %}
+  {% empty %}
+  <p>Никто ещё ничего не опубликовал в этом сообществе.</p>
 {% endfor %}
 {% include 'posts/includes/paginator.html' %}
 {% endblock %}
