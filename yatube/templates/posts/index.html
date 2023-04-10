@@ -11,6 +11,8 @@
     <a href="{% url 'posts:group_list' post.group.slug %}">все публикации сообщества {{ post.group }}</a>
   {% endif %}
   {% if not forloop.last %}<hr>{% endif %}
+  {% empty %}
+  <p>Никто ещё ничего не опубликовал.</p>
 {% endfor %}
 {% include 'posts/includes/paginator.html' %}
 {% endcache %}
