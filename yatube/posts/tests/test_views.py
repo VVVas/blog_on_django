@@ -395,10 +395,12 @@ class PostsFollowTests(TestCase):
             text='Басня возможна.',
         )
 
-    def test_posts_follow_follow_unfollow(self):
-        """Тест подписки."""
+    def setUp(self):
         self.user_client = Client()
         self.user_client.force_login(self.user)
+
+    def test_posts_follow_follow(self):
+        """Тест подписки."""
         response = self.user_client.get(
             reverse(
                 PROFILE_FOLLOW_URL_NAME,
@@ -416,6 +418,13 @@ class PostsFollowTests(TestCase):
                 user=self.user,
                 author=self.author
             ).exists()
+        )
+
+    def test_posts_follow_unfollow(self):
+        """Тест отписки."""
+        Follow.objects.create(
+            user=self.user,
+            author=self.author
         )
         response = self.user_client.get(
             reverse(
