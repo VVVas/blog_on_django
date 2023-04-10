@@ -39,6 +39,12 @@ class CreateEditFormTests(TestCase):
             content=cls.small_gif,
             content_type='image/gif'
         )
+        cls.not_img_txt = b'not_img'
+        cls.not_img_uploaded = SimpleUploadedFile(
+            name='not_img.txt',
+            content=cls.not_img_txt,
+            content_type='not_img_txt'
+        )
         cls.author = User.objects.create_user(username='author')
         cls.group = Group.objects.create(
             title='Тестовая группа при создании публикации',
@@ -79,6 +85,34 @@ class CreateEditFormTests(TestCase):
         self.assertTrue(
             Post.objects.filter(
                 text='Цезура абсурдно осознаёт экзистенциальный дискурс.',
+            ).exists()
+        )
+
+    def test_post_create_form_not_img(self):
+        """Нельзя загрузить некорректный файл"""
+        posts_count = Post.objects.count()
+        form_data = {
+            'text': 'Цикл полидисперсен.',
+            'image': self.not_img_uploaded,
+        }
+        response = self.author_client.post(
+            reverse(POST_CREATE_URL_NAME),
+            data=form_data,
+            follow=True
+        )
+        error_msg = ('Загрузите правильное изображение. Файл, который вы '
+                     'загрузили, поврежден или не является изображением.')
+        self.assertFormError(
+            response,
+            'form',
+            'image',
+            error_msg,
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Post.objects.count(), posts_count)
+        self.assertFalse(
+            Post.objects.filter(
+                text='Цикл полидисперсен.',
             ).exists()
         )
 
