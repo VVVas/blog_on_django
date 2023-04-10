@@ -37,20 +37,16 @@ class PostModelTest(TestCase):
             with self.subTest(model=model):
                 self.assertEqual(str(model), ideal_str)
 
-    def test_post_verbose_name(self):
-        """verbose_name модели Post совпадает с ожидаемым."""
-        post = PostModelTest.post
-        self.assertEqual(post._meta.verbose_name, 'Публикация')
-
-    def test_group_verbose_name(self):
-        """verbose_name модели Group совпадает с ожидаемым."""
-        group = PostModelTest.group
-        self.assertEqual(group._meta.verbose_name, 'Сообщество')
-
-    def test_comment_verbose_name(self):
-        """verbose_name модели Comment совпадает с ожидаемым."""
-        comment = PostModelTest.comment
-        self.assertEqual(comment._meta.verbose_name, 'Комментарий')
+    def test_posts_model_verbose_name(self):
+        """Проверяем verbose_name моделей."""
+        models_verbose_names = {
+            PostModelTest.post: 'Публикация',
+            PostModelTest.group: 'Сообщество',
+            PostModelTest.comment: 'Комментарий',
+        }
+        for model, verbose_name in models_verbose_names.items():
+            with self.subTest(model=model):
+                self.assertEqual(model._meta.verbose_name, verbose_name)
 
     def test_post_field_verbose_name(self):
         """verbose_name в полях модели Post совпадает с ожидаемым."""
