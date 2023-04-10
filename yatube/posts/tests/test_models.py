@@ -26,23 +26,16 @@ class PostModelTest(TestCase):
             text='Художественная гармония возможна.'
         )
 
-    def test_post_model_str(self):
-        """Проверяем __str__ модели Post."""
-        post = PostModelTest.post
-        ideal_post_str = post.text[:15]
-        self.assertEqual(str(post), ideal_post_str)
-
-    def test_group_model_str(self):
-        """Проверяем __str__ модели Group."""
-        group = PostModelTest.group
-        ideal_group_str = group.title
-        self.assertEqual(str(group), ideal_group_str)
-
-    def test_comment_model_str(self):
-        """Проверяем __str__ модели Comment."""
-        comment = PostModelTest.comment
-        ideal_comment_str = comment.text[:15]
-        self.assertEqual(str(comment), ideal_comment_str)
+    def test_posts_model_str(self):
+        """Проверяем __str__ моделей."""
+        models_ideal_strs = {
+            PostModelTest.post: PostModelTest.post.text[:15],
+            PostModelTest.group: PostModelTest.group.title,
+            PostModelTest.comment: PostModelTest.comment.text[:15],
+        }
+        for model, ideal_str in models_ideal_strs.items():
+            with self.subTest(model=model):
+                self.assertEqual(str(model), ideal_str)
 
     def test_post_verbose_name(self):
         """verbose_name модели Post совпадает с ожидаемым."""
