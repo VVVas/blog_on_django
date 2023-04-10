@@ -42,7 +42,7 @@ class Post(models.Model):
         help_text='Сообщество для публикации'
     )
     image = models.ImageField(
-        verbose_name='Картинка',
+        verbose_name='Изображение',
         upload_to=settings.POSTS_UPLOAD_TO,
         blank=True
     )

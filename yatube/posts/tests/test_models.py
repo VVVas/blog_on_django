@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 
-from posts.models import Group, Post
+from posts.models import Comment, Group, Post
 
 User = get_user_model()
 
@@ -20,6 +20,11 @@ class PostModelTest(TestCase):
             author=cls.user,
             text='Парономазия откровенна. Графомания отталкивает дольник.',
         )
+        cls.comment = Comment.objects.create(
+            post=cls.post,
+            author=cls.user,
+            text='Художественная гармония возможна.'
+        )
 
     def test_post_model_str(self):
         """Проверяем __str__ модели Post."""
@@ -33,6 +38,12 @@ class PostModelTest(TestCase):
         ideal_group_str = group.title
         self.assertEqual(str(group), ideal_group_str)
 
+    def test_comment_model_str(self):
+        """Проверяем __str__ модели Comment."""
+        comment = PostModelTest.comment
+        ideal_comment_str = comment.text[:15]
+        self.assertEqual(str(comment), ideal_comment_str)
+
     def test_post_verbose_name(self):
         """verbose_name модели Post совпадает с ожидаемым."""
         post = PostModelTest.post
@@ -43,6 +54,11 @@ class PostModelTest(TestCase):
         group = PostModelTest.group
         self.assertEqual(group._meta.verbose_name, 'Сообщество')
 
+    def test_comment_verbose_name(self):
+        """verbose_name модели Comment совпадает с ожидаемым."""
+        comment = PostModelTest.comment
+        self.assertEqual(comment._meta.verbose_name, 'Комментарий')
+
     def test_post_field_verbose_name(self):
         """verbose_name в полях модели Post совпадает с ожидаемым."""
         post = PostModelTest.post
@@ -51,6 +67,7 @@ class PostModelTest(TestCase):
             'pub_date': 'Дата',
             'author': 'Автор',
             'group': 'Сообщество',
+            'image': 'Изображение',
         }
         self._check_field_attr(field_verboses, post, 'verbose_name')
 
@@ -63,6 +80,17 @@ class PostModelTest(TestCase):
             'description': 'Описание',
         }
         self._check_field_attr(field_verboses, group, 'verbose_name')
+
+    def test_comment_field_verbose_name(self):
+        """verbose_name в полях модели Comment совпадает с ожидаемым."""
+        comment = PostModelTest.comment
+        field_verboses = {
+            'post': 'Публикация',
+            'author': 'Автор',
+            'text': 'Текст',
+            'created': 'Дата',
+        }
+        self._check_field_attr(field_verboses, comment, 'verbose_name')
 
     def test_post_field_help_text(self):
         """help_text в полях модели Post совпадает с ожидаемым."""
