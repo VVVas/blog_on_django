@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.db.utils import IntegrityError
 from django.test import TestCase
 
 from posts.models import Comment, Follow, Group, Post
@@ -87,6 +88,15 @@ class PostModelTest(TestCase):
         }
         self._check_field_attr(field_verboses, comment, 'verbose_name')
 
+    def test_follow_field_verbose_name(self):
+        """verbose_name в полях модели Follow совпадает с ожидаемым."""
+        follow = PostModelTest.follow
+        field_verboses = {
+            'user': 'Подписчик',
+            'author': 'Автор',
+        }
+        self._check_field_attr(field_verboses, follow, 'verbose_name')
+
     def test_post_field_help_text(self):
         """help_text в полях модели Post совпадает с ожидаемым."""
         post = PostModelTest.post
@@ -95,6 +105,14 @@ class PostModelTest(TestCase):
             'group': 'Сообщество для публикации',
         }
         self._check_field_attr(field_help_texts, post, 'help_text')
+
+    def test_follow_user_author_pair_unique(self):
+        """Пары подписчик и автор будут уникальны в модели Follow"""
+        with self.assertRaises(IntegrityError):
+            Follow.objects.create(
+                user=self.user,
+                author=self.author,
+            )
 
     def _check_field_attr(self, field_expected, model, attr):
         for field, expected_value in field_expected.items():
