@@ -74,7 +74,7 @@ def post_detail(request, post_id):
 @login_required
 def post_create(request):
     template = 'posts/create_post.html'
-    if request.method == "POST":
+    if request.method == 'POST':
         form = PostForm(
             request.POST or None,
             files=request.FILES or None
@@ -95,7 +95,7 @@ def post_edit(request, post_id):
     template = 'posts/create_post.html'
     post = get_object_or_404(Post, id=post_id)
     if post.author == request.user:
-        if request.method == "POST":
+        if request.method == 'POST':
             form = PostForm(
                 request.POST or None,
                 files=request.FILES or None,
