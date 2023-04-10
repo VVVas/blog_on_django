@@ -99,5 +99,11 @@ class Follow(models.Model):
     )
 
     class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'author'],
+                name='%(app_label)s_%(class)s_user_author_pair_unique'
+            )
+        ]
         verbose_name = 'Подписка'
         verbose_name_plural = 'Подписки'
