@@ -10,6 +10,7 @@ User = get_user_model()
 
 
 def index(request):
+    """Лента всех публикаций"""
     post_list = Post.objects.prefetch_related(
         'author',
         'group',
@@ -23,6 +24,7 @@ def index(request):
 
 
 def group_posts(request, slug):
+    """Лента публикаций сообщества."""
     group = get_object_or_404(Group, slug=slug)
     post_list = group.posts.select_related(
         'author',
@@ -37,6 +39,7 @@ def group_posts(request, slug):
 
 
 def profile(request, username):
+    """Профиль пользователя и лента его публикаций."""
     author = get_object_or_404(User, username=username)
     user = request.user
     post_list = author.posts.select_related(
@@ -56,6 +59,7 @@ def profile(request, username):
 
 
 def post_detail(request, post_id):
+    """Страница публикации."""
     post = get_object_or_404(Post, id=post_id)
     comments = post.comments.select_related(
         'author',
@@ -73,6 +77,7 @@ def post_detail(request, post_id):
 
 @login_required
 def post_create(request):
+    """Создание публикации."""
     template = 'posts/create_post.html'
     if request.method == 'POST':
         form = PostForm(
@@ -92,6 +97,7 @@ def post_create(request):
 
 @login_required
 def post_edit(request, post_id):
+    """Редактирование публикации."""
     template = 'posts/create_post.html'
     post = get_object_or_404(Post, id=post_id)
     if post.author == request.user:
@@ -114,6 +120,7 @@ def post_edit(request, post_id):
 
 @login_required
 def add_comment(request, post_id):
+    """Добавление комментария к публикации."""
     post = get_object_or_404(Post, id=post_id)
     if request.method == 'POST':
         form = CommentForm(request.POST or None)
@@ -127,6 +134,7 @@ def add_comment(request, post_id):
 
 @login_required
 def follow_index(request):
+    """Лента публикаций избранных авторов."""
     author_list = request.user.follower.values('author')
     post_list = Post.objects.filter(author__in=author_list).select_related(
         'group',
