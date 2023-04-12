@@ -35,6 +35,73 @@ User = get_user_model()
 TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
 
 
+class CreateEditBadProcessTests(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.user = User.objects.create_user(username='user')
+        cls.author = User.objects.create_user(username='author')
+        cls.post = Post.objects.create(
+            author=cls.author,
+            text='Аллегория отталкивает одиннадцатисложник.',
+        )
+
+    def test_post_create_anonymous(self):
+        """Аноним не создает публикацию"""
+        posts_count = Post.objects.count()
+        form_data = {
+            'text': 'Орнаментальный сказ неизменяем.',
+        }
+        response = self.client.post(
+            reverse(POST_CREATE_URL_NAME),
+            data=form_data,
+            follow=True
+        )
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        redirect_url = (
+            reverse(settings.LOGIN_URL) + '?next='
+            + reverse(POST_CREATE_URL_NAME)
+        )
+        self.assertRedirects(response, redirect_url)
+        self.assertEqual(Post.objects.count(), posts_count)
+        self.assertFalse(
+            Post.objects.filter(
+                text='Орнаментальный сказ неизменяем.',
+            ).exists()
+        )
+
+    def test_post_edit_user_not_author(self):
+        """Пользователь не автор не редактирует публикацию"""
+        self.user_client = Client()
+        self.user_client.force_login(self.user)
+        posts_count = Post.objects.count()
+        form_data = {
+            'text': 'Акцент отталкивает цикл.',
+        }
+        response = self.user_client.post(
+            reverse(POST_EDIT_URL_NAME, kwargs={'post_id': self.post.id}),
+            data=form_data,
+            follow=True
+        )
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        self.assertRedirects(
+            response, reverse(
+                POST_DETAIL_URL_NAME, kwargs={'post_id': self.post.id}
+            )
+        )
+        self.assertEqual(Post.objects.count(), posts_count)
+        self.assertTrue(
+            Post.objects.filter(
+                text='Аллегория отталкивает одиннадцатисложник.',
+            ).exists()
+        )
+        self.assertFalse(
+            Post.objects.filter(
+                text='Акцент отталкивает цикл.',
+            ).exists()
+        )
+
+
 class PostsNameTests(TestCase):
     @classmethod
     def setUpClass(cls):
