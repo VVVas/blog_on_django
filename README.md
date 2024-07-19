@@ -1,3 +1,6 @@
-# hw05_final
+# Блог  
+Позволяет пользователям регистрироваться, создавать и редактировать публикации, оставлять к ним комментарии, подписываться на других авторов.  
+Настроено кэширование главной страницы.  
 
-[![CI](https://github.com/yandex-praktikum/hw05_final/actions/workflows/python-app.yml/badge.svg?branch=master)](https://github.com/yandex-praktikum/hw05_final/actions/workflows/python-app.yml)
+## Стек технологий  
+Python, Django, Pillow, SQLite  
