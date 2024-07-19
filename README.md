@@ -4,3 +4,5 @@
 
 ## Стек технологий  
 Python, Django, Pillow, SQLite  
+
+[Мишустин Василий](https://github.com/vvvas), v@vvvas.ru  
